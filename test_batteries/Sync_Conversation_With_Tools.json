@@ -1,0 +1,40 @@
+{
+  "tests": [
+    {
+      "name": "Turn1_Greeting",
+      "input": "Hello, how are you today?",
+      "expected": "hello",
+      "tools": []
+    },
+    {
+      "name": "Turn2_Introduction",
+      "input": "My name is Alice. What's yours?",
+      "expected": "alex",
+      "tools": []
+    },
+    {
+      "name": "Turn3_MemoryCheck",
+      "input": "Do you remember my name?",
+      "expected": "alice",
+      "tools": []
+    },
+    {
+      "name": "Turn4_WeatherRequest",
+      "input": "What's the weather like today in Boolboonda, QLD?",
+      "expected": "35",
+      "tools": ["get_weather_station_results"]
+    },
+    {
+      "name": "Turn5_CalendarCheck",
+      "input": "What's on my calendar for today?",
+      "expected": "team meeting",
+      "tools": ["check_calendar"]
+    },
+    {
+      "name": "Turn6_FollowUp",
+      "input": "Based on the weather and my schedule, should I go for a walk after my meeting?",
+      "expected": "yes",
+      "tools": []
+    }
+  ]
+}
