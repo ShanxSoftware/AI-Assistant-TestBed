@@ -5,11 +5,18 @@ import os
 import json
 from typing import Optional, Dict, Callable
 from pydantic import BaseModel, Field
-
+from dotenv import load_dotenv
 # Import library components
-from xaihandler import xAI_Handler
-from personality import AgentPersonality, Archetype, AgentTrait, Trait
-from memory import StatefulMemory
+from xaihandler import (
+    xAI_Handler,
+    AgentPersonality, 
+    Archetype, 
+    AgentTrait, 
+    Trait,
+    StatefulMemory
+)
+
+load_dotenv()
 
 # Simulated tool functions for testing
 def check_calendar(query_date: Optional[str] = None) -> Dict:
@@ -25,7 +32,7 @@ def check_calendar(query_date: Optional[str] = None) -> Dict:
 class CalendarParams(BaseModel):
     query_date: Optional[str] = Field(default=None, description="Date in YYYY-MM-DD")
 
-def calculate_math(expression: str) -> float: #: JAKOB: Grok, should this be a Dict? Check https://docs.x.ai/docs/guides/function-calling
+def calculate_math(expression: str) -> str: #: JAKOB: Grok, should this be a Dict? Check https://docs.x.ai/docs/guides/function-calling
     """Simulated math calculator tool."""
     try:
         return eval(expression)  # For demo only; use safe eval in production
@@ -145,10 +152,10 @@ def manual_chat(handler: xAI_Handler):
 
 def main():
     # Initialize handler
-    handler = xAI_Handler(
-        api_key=os.getenv("XAI_API_KEY"),
-        validate_connection=False
-    )
+    api_key = os.getenv("XAI_API_KEY")
+    if not api_key: 
+        raise ValueError("XAI_API_KEY missing in .env")
+    handler = xAI_Handler(api_key=api_key, validate_connection=False)
 
     # Menu: Select personality preset
     print("\nAvailable Personality Presets:")
