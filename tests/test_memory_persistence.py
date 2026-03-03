@@ -1,4 +1,7 @@
 # tests/test_memory_persistence.py
+from xaihandler import (
+    xAI_Handler
+)
 def test_full_state_save_load(assistant):
     sess = "persist-1"
     assistant.chat("Secret code is 4242", session_id=sess)
