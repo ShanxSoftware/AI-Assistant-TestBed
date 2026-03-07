@@ -6,8 +6,7 @@ from xaihandler import (
     xAI_Handler,
     AgentPersonality, 
     Archetype, 
-    ToolDefinition,
-    ToolRegistry, 
+    MemoryStore,
     BudgetExceeded,
     AgentTrait, 
     Trait
@@ -49,6 +48,7 @@ def agent(request):
 
 @pytest.fixture(params=list(Archetype))
 def assistant(request, api_key, tmp_path):
+    db_path = tmp_path / f"test_{request.param.value}.db"
     p = AgentPersonality(
         name=f"Test{request.param.value.title()}Bot",
         gender="unspecified",
@@ -57,10 +57,12 @@ def assistant(request, api_key, tmp_path):
         job_description="helpful test assistant",
         traits=[]  # minimal; extend per archetype in specific tests
     )
+    
     h = xAI_Handler(api_key=api_key, 
                     model=api_model, 
                     timeout=api_timeout, 
                     validate_connection=False)
+    h.memory = MemoryStore(db_path=str(db_path))
     h.set_personality(p)
     # register one shared tool for all tests
     from pydantic import BaseModel
@@ -68,6 +70,13 @@ def assistant(request, api_key, tmp_path):
         text: str
     def echo_tool(text: str):
         return f"Echo: {text}"
-    h.add_tool(ToolDefinition("echo", "Echo text", echo_tool, EchoInput))
+    
+    h.add_tool(name="echo_tool", 
+               description="Tool for testing xai-api function calls, outputs 'Echo: {text}'", # I made the description explict so that the AI model knows to call the function rather than figuring it out with internal reasoning.
+               parameters=EchoInput, func=echo_tool)
     yield h
-    # cleanup: optional delete temp db if needed
+    
+    # Cleanup: delete the DB file after this personality's tests complete
+    if db_path.exists():
+        db_path.unlink()
+        print(f"Cleaned up DB: {db_path}")  # optional logging
